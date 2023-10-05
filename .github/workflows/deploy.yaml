@@ -28,8 +28,10 @@ jobs:
           server-password: OSSHR_PASSWORD # env variable for token in deploy
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }} # Value of the GPG private key to import
 
-      - name: Update version in pom.xml (Release only)
-        run: mvn -B versions:set -DnewVersion=${{ github.event.release.tag_name }} -DgenerateBackupPoms=false
+      - name: Update version and SCM tag in pom.xml
+        run: |
+          mvn -B versions:set -DnewVersion=${{ github.event.release.tag_name }} -DgenerateBackupPoms=false
+          mvn -B versions:set-scm-tag -DnewTag=${{ github.event.release.tag_name }} -DgenerateBackupPoms=false
 
       - name: Publish to Apache Maven Central
         run: mvn clean deploy --no-transfer-progress --batch-mode -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }}
